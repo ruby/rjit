@@ -4,7 +4,7 @@ require_relative 'lib/rjit/version'
 
 Gem::Specification.new do |spec|
   spec.name = 'rjit'
-  spec.version = Rjit::VERSION
+  spec.version = RJIT::VERSION
   spec.authors = ['Takashi Kokubun']
   spec.email = ['takashikkbn@gmail.com']
 
