@@ -18,7 +18,7 @@ require 'fiddle/import'
 require 'set'
 
 # Path to the build directory of ruby/ruby
-build_dir = ARGV.first&.then { File.expand_path(it) } || File.expand_path('../ruby', __dir__)
+build_dir = ARGV.first&.then { |it| File.expand_path(it) } || File.expand_path('../ruby', __dir__)
 
 class Node < Struct.new(
   :kind,
