@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
-# Usage
+#
+# Build ../ruby first and then execute this file.
+#
+# Usage:
 #   $ bin/bindgen                # Assumes ../ruby does in-place build
 #   $ bin/bindgen RUBY_BUILD_DIR # Assumes RUBY_BUILD_DIR builds ../ruby
 
@@ -9,6 +12,7 @@ require 'bundler/inline'
 gemfile(true) do
   source 'https://rubygems.org'
   gem 'ffi-clang', '0.7.0', require: false
+  gem 'fiddle', '1.1.6', require: false
 end
 
 # Help ffi-clang find libclang
