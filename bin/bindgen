@@ -232,9 +232,15 @@ class BindingGenerator
   def generate_node(node, sizeof_type: nil)
     case node&.kind
     when :struct, :union
-      # node.spelling is often empty for union, but we'd like to give it a name when it has one.
+      # `node.spelling` is often empty for union, but we'd like to give it a name when it has one.
+      #
+      # However, in recent LLVM like llvm-18, it may give "union (unnamed at /path/to/vm_core.h:1158:9)",
+      # so use an empty string like before in such cases.
+      node_spelling = node.spelling
+      node_spelling = '' if node_spelling.match?(/\A(struct|union) \(unnamed at .+\)\z/)
+
       buf = +"CType::#{node.kind.to_s.sub(/\A[a-z]/, &:upcase)}.new(\n"
-      buf << "  \"#{node.spelling}\", Primitive.cexpr!(\"SIZEOF(#{sizeof_type || node.type})\"),\n"
+      buf << "  \"#{node_spelling}\", Primitive.cexpr!(\"SIZEOF(#{sizeof_type || node.type})\"),\n"
       bit_fields_end = node.children.index { |c| c.bitwidth == -1 } || node.children.size # first non-bit field index
       node.children.each_with_index do |child, i|
         skip_type = sizeof_type&.gsub(/\(\(struct ([^\)]+) \*\)NULL\)->/, '\1.') || node.spelling
@@ -629,7 +635,6 @@ generator = BindingGenerator.new(
     rb_thread_struct
     rb_jit_func_t
     rb_iseq_param_keyword
-    rb_rjit_options
     rb_callinfo_kwarg
   ],
   # #ifdef-dependent immediate types, which need Primitive.cexpr! for type detection
@@ -642,7 +647,7 @@ generator = BindingGenerator.new(
     rb_execution_context_struct: %w[method_missing_reason], # non-leading bit fields not supported
     rb_iseq_constant_body: %w[jit_exception jit_exception_calls yjit_payload yjit_calls_at_interv], # conditionally defined
     rb_thread_struct: %w[status has_dedicated_nt to_kill abort_on_exception report_on_exception pending_interrupt_queue_checked],
-    :'' => %w[is_from_method is_lambda is_isolated], # rb_proc_t
+    rb_proc_t: %w[is_from_method is_lambda is_isolated],
   },
   ruby_fields: {
     rb_iseq_constant_body: %w[

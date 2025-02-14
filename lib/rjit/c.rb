@@ -1143,7 +1143,6 @@ module RubyVM::RJIT # :nodoc: all
       mandatory_only_iseq: [CType::Pointer.new { self.rb_iseq_t }, Primitive.cexpr!("OFFSETOF((*((struct rb_iseq_constant_body *)NULL)), mandatory_only_iseq)")],
       jit_entry: [self.rb_jit_func_t, Primitive.cexpr!("OFFSETOF((*((struct rb_iseq_constant_body *)NULL)), jit_entry)")],
       jit_entry_calls: [CType::Immediate.parse("unsigned long"), Primitive.cexpr!("OFFSETOF((*((struct rb_iseq_constant_body *)NULL)), jit_entry_calls)")],
-      rjit_blocks: [self.VALUE, Primitive.cexpr!("OFFSETOF((*((struct rb_iseq_constant_body *)NULL)), rjit_blocks)"), true],
     )
   end
 
@@ -1284,23 +1283,8 @@ module RubyVM::RJIT # :nodoc: all
 
   def C.rb_proc_t
     @rb_proc_t ||= CType::Struct.new(
-      "", Primitive.cexpr!("SIZEOF(rb_proc_t)"),
+      "rb_proc_t", Primitive.cexpr!("SIZEOF(rb_proc_t)"),
       block: [self.rb_block, Primitive.cexpr!("OFFSETOF((*((rb_proc_t *)NULL)), block)")],
-    )
-  end
-
-  def C.rb_rjit_options
-    @rb_rjit_options ||= CType::Struct.new(
-      "rb_rjit_options", Primitive.cexpr!("SIZEOF(struct rb_rjit_options)"),
-      on: [self._Bool, Primitive.cexpr!("OFFSETOF((*((struct rb_rjit_options *)NULL)), on)")],
-      exec_mem_size: [CType::Immediate.parse("unsigned int"), Primitive.cexpr!("OFFSETOF((*((struct rb_rjit_options *)NULL)), exec_mem_size)")],
-      call_threshold: [CType::Immediate.parse("unsigned int"), Primitive.cexpr!("OFFSETOF((*((struct rb_rjit_options *)NULL)), call_threshold)")],
-      stats: [self._Bool, Primitive.cexpr!("OFFSETOF((*((struct rb_rjit_options *)NULL)), stats)")],
-      disable: [self._Bool, Primitive.cexpr!("OFFSETOF((*((struct rb_rjit_options *)NULL)), disable)")],
-      trace: [self._Bool, Primitive.cexpr!("OFFSETOF((*((struct rb_rjit_options *)NULL)), trace)")],
-      trace_exits: [self._Bool, Primitive.cexpr!("OFFSETOF((*((struct rb_rjit_options *)NULL)), trace_exits)")],
-      dump_disasm: [self._Bool, Primitive.cexpr!("OFFSETOF((*((struct rb_rjit_options *)NULL)), dump_disasm)")],
-      verify_ctx: [self._Bool, Primitive.cexpr!("OFFSETOF((*((struct rb_rjit_options *)NULL)), verify_ctx)")],
     )
   end
 
