@@ -2,9 +2,9 @@
 
 Ruby JIT toolkit
 
-## Usage
+## Description
 
-TODO: Write usage instructions here
+Under development. To be implemented before the Ruby 3.5.0 release.
 
 ## License
 
