@@ -17,9 +17,8 @@ require 'etc'
 require 'fiddle/import'
 require 'set'
 
-unless build_dir = ARGV.first
-  abort "Usage: #{$0} BUILD_DIR"
-end
+# Path to the build directory of ruby/ruby
+build_dir = ARGV.first&.then { File.expand_path(it) } || File.expand_path('../ruby', __dir__)
 
 class Node < Struct.new(
   :kind,
@@ -355,9 +354,9 @@ class BindingGenerator
   end
 end
 
-src_dir = File.expand_path('../..', __dir__)
-src_path = File.join(src_dir, 'rjit_c.rb')
-build_dir = File.expand_path(build_dir)
+rjit_dir = File.expand_path('..', __dir__)
+rjit_c_rb = File.join(rjit_dir, 'lib/rjit/c.rb')
+rjit_c_h = File.join(rjit_dir, 'src/rjit/c.h')
 cflags = [
   src_dir,
   build_dir,
@@ -372,9 +371,9 @@ if Dir.exist?(clangd_cache)
 end
 
 # Parse rjit_c.h and generate rjit_c.rb
-nodes = HeaderParser.new(File.join(src_dir, 'rjit_c.h'), cflags: cflags).parse
+nodes = HeaderParser.new(rjit_c_h, cflags: cflags).parse
 generator = BindingGenerator.new(
-  src_path: src_path,
+  src_path: rjit_c_rb,
   consts: {
     LONG: %w[
       UNLIMITED_ARGUMENTS
@@ -662,4 +661,4 @@ generator = BindingGenerator.new(
 generator.generate(nodes)
 
 # Write rjit_c.rb
-File.write(src_path, generator.src)
+File.write(rjit_c_rb, generator.src)
